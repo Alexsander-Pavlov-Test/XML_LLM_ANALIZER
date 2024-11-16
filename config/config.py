@@ -1,9 +1,12 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel
 from starlette.config import Config
+import pathlib
 
 
 config = Config('.env')
+
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
 class DBSettings(BaseModel):
@@ -46,6 +49,8 @@ class Settings(BaseSettings):
     db: DBSettings = DBSettings()
     rabbit: RabbitSettings = RabbitSettings()
     debug: bool = bool(int(config('DEBUG')))
+    NAME_XML: str = 'items.xml'
+    PATH_ITEMS_XML: pathlib.Path = BASE_DIR / NAME_XML
 
 
 settings = Settings()
