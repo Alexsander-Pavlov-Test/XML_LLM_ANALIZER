@@ -1,14 +1,13 @@
 from typing import Any, Mapping
 from starlette.background import BackgroundTask
 
-import pandas as pd
-
-from loguru import logger
+from xml.dom import minidom
 
 from fastapi.responses import Response, PlainTextResponse
+from api_v1.utils import correct_xml_path
 
 
-class XMLRender(Response):
+class FileXMLRender(Response):
     """
     Рендер XML ответа
     """
@@ -28,52 +27,5 @@ class XMLRender(Response):
     def render(self,
                value: Any,
                ) -> PlainTextResponse:
-        logger.debug(f'get path xml {value}')
-        xml = pd.read_xml(value,
-                          iterparse={'product': ['id',
-                                                 'name',
-                                                 'quantity',
-                                                 'price',
-                                                 'category',
-                                                 ],
-                                     },
-                          encoding=self.charset,
-                          )
-        return xml.to_xml().encode(self.charset)
-
-
-def render(
-    value: Any,
-    accept: str | None,
-    status_code: int | None,
-    headers: dict[str, str] | None,
-    renderers: list[Response] | None = None,
-):
-    """
-    Рендерит ответ того типа,
-    исходя из которого был запрос (Media Type)
-    """
-    renderers = renderers or [XMLRender]
-    if accept:
-        for media_type in accept.split(','):
-            media_type = media_type.split(';')[0].strip()
-            for renderer in renderers:
-                if media_type in renderer.media_type:
-                    initialization: Response = renderer(
-                        content=value,
-                        status_code=status_code,
-                        headers=headers,
-                        media_type=media_type,
-                        )
-                    logger.debug(f'in render path {value}')
-                    return initialization
-    renderer = renderers[0]
-    media_type = renderer.media_types[0]
-    initialization: Response = renderer(
-        content=value,
-        status_code=status_code,
-        headers=headers,
-        media_type=media_type,
-        )
-    logger.debug(f'in render path {value}')
-    return initialization
+        xml = correct_xml_path(value)
+        return minidom.parse(xml.as_posix()).toxml(encoding='utf-8')
