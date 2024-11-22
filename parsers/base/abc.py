@@ -1,17 +1,18 @@
 from collections.abc import Sequence
 from abc import ABC, abstractmethod
 from typing import Any, ClassVar, TextIO, Generator, Callable
+from xml.dom.minidom import Document
 
 
 class AbstractXMLParser(ABC, Sequence):
     """
     Абстрактный класс XML Парсера
     """
-    PARSER: ClassVar[Callable[...] | None] = None
+    PARSER: ClassVar[Callable[[str | TextIO], Document] | None] = None
 
     @abstractmethod
     @classmethod
-    def get_parser(cls) -> Callable[...] | None:
+    def get_parser(cls) -> Callable[[str | TextIO], Document] | None:
         pass
 
     @abstractmethod

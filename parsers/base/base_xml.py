@@ -1,4 +1,7 @@
-from typing import Generator, TextIO, Any
+from typing import Generator, TextIO, Any, Callable
+from xml.dom.minicompat import NodeList
+from xml.dom.minidom import Document, Element
+from xml.parsers.expat import ExpatError
 
 from .abc import AbstractXMLParser
 from . import BaseModelNotProvideError
@@ -37,10 +40,20 @@ class BaseXMLParser(AbstractXMLParser):
         raise BaseModelNotProvideError(
                 f'Вы не можете использовать базовый класс {cls}',
                 )
+    
+    def _get_document(self,
+                      xml: str | TextIO,
+                      parser: Callable[[str | TextIO], Document],
+                      target_items: str,
+                      ) -> Document:
+        try:
+            items = parser(xml)
+        except ExpatError:
+            raise
 
     def _parse(self,
-               xml,
-               target_items,
+               xml: str | TextIO,
+               target_items: str,
                ) -> list[dict[str, str]] | None:
         """
         Метод парсинга данных из XML

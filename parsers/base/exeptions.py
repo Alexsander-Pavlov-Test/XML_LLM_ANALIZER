@@ -1,4 +1,14 @@
 class BaseModelNotProvideError(Exception):
     """
-    Исключение вызваное использованием базового класса
+    Исключение вызванное использованием базового класса
     """
+
+    pass
+
+
+class XMLParseError(Exception):
+    """
+    Исключение вызванное проблемами при парсинге XML
+    """
+
+    pass
