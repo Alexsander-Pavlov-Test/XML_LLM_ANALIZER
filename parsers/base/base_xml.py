@@ -5,7 +5,11 @@ from xml.dom.minidom import Document, Element
 from xml.parsers.expat import ExpatError
 
 from parsers.base.abc import AbstractXMLParser
-from parsers.base.exeptions import BaseModelNotProvideError, XMLParseError
+from parsers.base.exeptions import (
+    BaseModelNotProvideError,
+    XMLParseError,
+    HeadNotFoundError,
+    )
 from parsers.base.parse_except import parse_expat_error
 
 
@@ -24,7 +28,12 @@ class BaseXMLParser(AbstractXMLParser):
         self._check_xml_instance(xml=xml)
         self.target_items = target_items
         self.head_name = head_name
-        self.items = self._parse(xml=xml, target_items=target_items)
+        self._head = None
+        self.items = self._parse(
+            xml=xml,
+            target_items=target_items,
+            head_name=head_name,
+            )
 
     @classmethod
     def get_parser(cls):
@@ -65,6 +74,15 @@ class BaseXMLParser(AbstractXMLParser):
                             in list_elements]
         return list_parse_items
 
+    def _get_head(self,
+                  document: Document,
+                  head_name: str,
+                  ) -> None:
+        try:
+            self._head = document.firstChild.attributes[head_name].nodeValue
+        except KeyError:
+            raise HeadNotFoundError(f'Атрибута с ключем {head_name} не найдено')
+
     def _get_items_target(self,
                           document: Document,
                           target_items: str,
@@ -86,6 +104,7 @@ class BaseXMLParser(AbstractXMLParser):
     def _parse(self,
                xml: str | TextIO,
                target_items: str,
+               head_name: str | None,
                ) -> list[dict[str, str]] | list[None]:
         """
         Метод парсинга данных из XML
@@ -95,6 +114,11 @@ class BaseXMLParser(AbstractXMLParser):
             xml=xml,
             parser=parser,
         )
+        if head_name:
+            self._get_head(
+                document=document,
+                head_name=head_name,
+            )
         list_elements = self._get_items_target(
             document=document,
             target_items=target_items,
@@ -106,8 +130,9 @@ class BaseXMLParser(AbstractXMLParser):
             return list_parse_items
         return []
 
-    def get_head(self) -> dict[str, str]:
-        pass
+    @property
+    def head(self) -> dict[str, str]:
+        return self._head
 
     def get_list(self) -> list[dict[str, str] | None]:
         """

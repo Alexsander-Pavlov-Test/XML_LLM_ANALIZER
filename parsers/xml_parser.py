@@ -13,7 +13,7 @@ class StringXMLParser(BaseXMLParser):
     """
     PARSER = parseString
 
-    def _check_xml_instance(self, xml: str | TextIO) -> None:
+    def _check_xml_instance(self, xml: str) -> None:
         if not xml.startswith('<?'):
             raise XMLParseError('Ошибка: XML файл должен иметь заголовок по '
                                 'типу <?xml version="1.0" encoding="utf-8"?>')
