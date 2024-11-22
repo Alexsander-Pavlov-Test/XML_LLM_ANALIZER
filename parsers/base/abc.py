@@ -10,8 +10,8 @@ class AbstractXMLParser(ABC, Sequence):
     """
     PARSER: ClassVar[Callable[[str | TextIO], Document] | None] = None
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def get_parser(cls) -> Callable[[str | TextIO], Document] | None:
         pass
 
@@ -24,5 +24,5 @@ class AbstractXMLParser(ABC, Sequence):
         pass
 
     @abstractmethod
-    def get_generator(self) -> Generator[dict[str, str], Any] | None:
+    def get_generator(self) -> Generator[dict[str, str], None, None] | None:
         pass
