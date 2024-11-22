@@ -11,7 +11,7 @@ from parsers.base.parse_except import parse_expat_error
 
 class BaseXMLParser(AbstractXMLParser):
     """
-    XML парсер
+    Базовый XML парсер
     """
     PARSER = None
 
@@ -52,12 +52,12 @@ class BaseXMLParser(AbstractXMLParser):
                 )
 
     def _stuct_list_items(self,
-                          list_elements: Generator[NodeList[Element]],
+                          list_elements: Generator[NodeList[Element], None, None],
                           ):
         """
         Вывод списка items
         """
-        list_parse_items = [{item.nodeName: item.firstChild
+        list_parse_items = [{item.nodeName: item.firstChild.nodeValue
                              for item
                              in element.childNodes
                              if item.firstChild}
@@ -70,7 +70,7 @@ class BaseXMLParser(AbstractXMLParser):
                           target_items: str,
                           ) -> Generator[NodeList[Element], None, None]:
         items = document.getElementsByTagName(target_items)
-        yield items
+        return items
 
     def _get_document(self,
                       xml: str | TextIO,
@@ -105,6 +105,9 @@ class BaseXMLParser(AbstractXMLParser):
             )
             return list_parse_items
         return []
+
+    def get_head(self) -> dict[str, str]:
+        pass
 
     def get_list(self) -> list[dict[str, str] | None]:
         """
