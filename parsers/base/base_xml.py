@@ -1,5 +1,7 @@
 import operator
-from typing import Generator, TextIO, Callable
+from typing import TextIO
+from collections.abc import Sequence, Generator, Callable
+from collections import defaultdict
 from xml.dom.minicompat import NodeList
 from xml.dom.minidom import Document, Element
 from xml.parsers.expat import ExpatError
@@ -22,17 +24,17 @@ class BaseXMLParser(AbstractXMLParser):
     def __init__(self,
                  xml: str | TextIO,
                  target_items: str,
-                 head_name: str | None = None,
+                 attrs: Sequence[str] | None = None,
                  ) -> None:
         self.xml = xml
         self._check_xml_instance(xml=xml)
         self.target_items = target_items
-        self.head_name = head_name
-        self._head = None
+        self.values = tuple(attrs)
+        self._attrs: dict[str, str] | None = None
         self.items = self._parse(
             xml=xml,
             target_items=target_items,
-            head_name=head_name,
+            attrs=attrs,
             )
 
     @classmethod
@@ -74,14 +76,20 @@ class BaseXMLParser(AbstractXMLParser):
                             in list_elements]
         return list_parse_items
 
-    def _get_head(self,
-                  document: Document,
-                  head_name: str,
-                  ) -> None:
-        try:
-            self._head = document.firstChild.attributes[head_name].nodeValue
-        except KeyError:
-            raise HeadNotFoundError(f'Атрибута с ключем {head_name} не найдено')
+    def _get_attrs(self,
+                   document: Document,
+                   attrs: Sequence[str],
+                   ) -> None:
+        result = defaultdict(str)
+        for attr in attrs:
+            result[attr]
+            curr_nodes = document.childNodes
+            while curr_nodes:
+                for node in curr_nodes:
+                    if attr in node.attributes:
+                        result.update({attr: node.attributes.get(attr).nodeValue})
+                curr_nodes = [node for node in curr_nodes[0].childNodes if node.firstChild]
+        self._attrs = result
 
     def _get_items_target(self,
                           document: Document,
@@ -104,7 +112,7 @@ class BaseXMLParser(AbstractXMLParser):
     def _parse(self,
                xml: str | TextIO,
                target_items: str,
-               head_name: str | None,
+               attrs: Sequence[str] | None,
                ) -> list[dict[str, str]] | list[None]:
         """
         Метод парсинга данных из XML
@@ -114,10 +122,10 @@ class BaseXMLParser(AbstractXMLParser):
             xml=xml,
             parser=parser,
         )
-        if head_name:
-            self._get_head(
+        if attrs:
+            self._get_attrs(
                 document=document,
-                head_name=head_name,
+                attrs=attrs,
             )
         list_elements = self._get_items_target(
             document=document,
@@ -131,8 +139,8 @@ class BaseXMLParser(AbstractXMLParser):
         return []
 
     @property
-    def head(self) -> dict[str, str]:
-        return self._head
+    def attrs(self) -> dict[str, str]:
+        return self._attrs
 
     def get_list(self) -> list[dict[str, str] | None]:
         """
