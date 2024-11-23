@@ -12,11 +12,3 @@ class XMLParseError(Exception):
     """
 
     pass
-
-
-class HeadNotFoundError(Exception):
-    """
-    Исключение вызванное ошибкой ключа атрибута
-    """
-
-    pass

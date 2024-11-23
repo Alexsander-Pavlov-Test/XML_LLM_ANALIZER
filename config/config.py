@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     regex: Regex = Regex()
     NAME_XML: str = 'items.xml'
     PATH_ITEMS_XML: Path = BASE_DIR.joinpath(NAME_XML)
+    DATE_FORMAT: str = '%Y-%m-%d'
 
 
 settings = Settings()

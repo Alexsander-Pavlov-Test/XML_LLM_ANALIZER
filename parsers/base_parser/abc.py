@@ -17,7 +17,7 @@ class AbstractXMLParser(ABC, Sequence):
 
     @property
     @abstractmethod
-    def head(self) -> dict[str, str]:
+    def attrs(self) -> dict[str, str]:
         pass
 
     @abstractmethod
