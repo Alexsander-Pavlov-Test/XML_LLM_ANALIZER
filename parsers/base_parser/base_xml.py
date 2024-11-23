@@ -6,13 +6,12 @@ from xml.dom.minicompat import NodeList
 from xml.dom.minidom import Document, Element
 from xml.parsers.expat import ExpatError
 
-from parsers.base.abc import AbstractXMLParser
-from parsers.base.exeptions import (
+from parsers.base_parser.abc import AbstractXMLParser
+from parsers.base_parser.exeptions import (
     BaseModelNotProvideError,
     XMLParseError,
-    HeadNotFoundError,
     )
-from parsers.base.parse_except import parse_expat_error
+from parsers.base_parser.parse_except import parse_expat_error
 
 
 class BaseXMLParser(AbstractXMLParser):
@@ -25,16 +24,19 @@ class BaseXMLParser(AbstractXMLParser):
                  xml: str | TextIO,
                  target_items: str,
                  attrs: Sequence[str] | None = None,
+                 type_converter: None = None,
                  ) -> None:
         self.xml = xml
         self._check_xml_instance(xml=xml)
         self.target_items = target_items
         self.values = tuple(attrs)
         self._attrs: dict[str, str] | None = None
+        self._type_converter = type_converter
         self.items = self._parse(
             xml=xml,
             target_items=target_items,
             attrs=attrs,
+            type_converter=type_converter,
             )
 
     @classmethod
@@ -113,6 +115,7 @@ class BaseXMLParser(AbstractXMLParser):
                xml: str | TextIO,
                target_items: str,
                attrs: Sequence[str] | None,
+               type_converter: None,
                ) -> list[dict[str, str]] | list[None]:
         """
         Метод парсинга данных из XML
@@ -135,6 +138,8 @@ class BaseXMLParser(AbstractXMLParser):
             list_parse_items = self._stuct_list_items(
                 list_elements=list_elements,
             )
+            if type_converter:
+                pass
             return list_parse_items
         return []
 
