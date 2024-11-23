@@ -27,6 +27,9 @@ class BaseXMLParser(AbstractXMLParser):
                  target_items: str,
                  attrs: Sequence[str] | None = None,
                  type_converter: BaseTypeConverter | None = DefaultTypeConverter,
+                 convert_int: bool = True,
+                 convert_float: bool = True,
+                 convert_date: bool = True,
                  ) -> None:
         self.xml = xml
         self._check_xml_instance(xml=xml)
@@ -34,6 +37,9 @@ class BaseXMLParser(AbstractXMLParser):
         self.values = tuple(attrs)
         self._attrs: dict[str, str] | None = None
         self._type_converter = type_converter
+        self.convert_int = bool(convert_int)
+        self.convert_float = bool(convert_float)
+        self.convert_date = bool(convert_date)
         self.items = self._parse(
             xml=xml,
             target_items=target_items,
@@ -79,7 +85,13 @@ class BaseXMLParser(AbstractXMLParser):
                 if item.firstChild:
                     parsed_dict[item.nodeName] = item.firstChild.nodeValue
             if type_converter:
-                yield type_converter(parsed_dict).convert()
+                converter = type_converter(
+                    parsed_dict,
+                    self.convert_int,
+                    self.convert_float,
+                    self.convert_date,
+                )
+                yield converter.convert()
             else:
                 yield parsed_dict
 
@@ -98,7 +110,13 @@ class BaseXMLParser(AbstractXMLParser):
                         result.update({attr: node.attributes.get(attr).nodeValue})
                 curr_nodes = [node for node in curr_nodes[0].childNodes if node.firstChild]
         if type_converter:
-            self._attrs = type_converter(result).convert()
+            converter = type_converter(
+                result,
+                self.convert_int,
+                self.convert_float,
+                self.convert_date,
+            )
+            self._attrs = converter.convert()
         else:
             self._attrs = result
 

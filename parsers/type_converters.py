@@ -25,10 +25,13 @@ class DefaultTypeConverter(BaseTypeConverter):
                         pass
             if parse_float:
                 try:
-                    value = self.convert_float(value)
-                    return value
+                    self.convert_int(value)
                 except TypeConvertError:
-                    pass
+                    try:
+                        value = self.convert_float(value)
+                        return value
+                    except TypeConvertError:
+                        pass
             if parse_date:
                 if value.find('-') != -1:
                     check = value.replace('-', '')
