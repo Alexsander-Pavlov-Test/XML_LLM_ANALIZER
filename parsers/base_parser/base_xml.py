@@ -34,7 +34,7 @@ class BaseXMLParser(AbstractXMLParser):
         self.xml = xml
         self._check_xml_instance(xml=xml)
         self.target_items = target_items
-        self.values = tuple(attrs)
+        self.values = tuple(attrs) if attrs else attrs
         self._attrs: dict[str, str] | None = None
         self._type_converter = type_converter
         self.convert_int = bool(convert_int)
@@ -64,7 +64,7 @@ class BaseXMLParser(AbstractXMLParser):
         return self.items[index]
 
     def __len__(self) -> int:
-        return len(self.items)
+        return
 
     def _check_xml_instance(self, xml: str | TextIO) -> None:
         cls = type(self).__name__

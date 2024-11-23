@@ -14,6 +14,11 @@ class StringXMLParser(BaseXMLParser):
     PARSER = parseString
 
     def _check_xml_instance(self, xml: str) -> None:
+        if not isinstance(xml, str):
+            cls = type(self).__name__
+            raise XMLParseError('Ошибка: Не возможно обработать '
+                                f'{xml} с помощью {cls}')
+
         if not xml.startswith('<?'):
             raise XMLParseError('Ошибка: XML файл должен иметь заголовок по '
                                 'типу <?xml version="1.0" encoding="utf-8"?>')
