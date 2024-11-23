@@ -12,6 +12,8 @@ from parsers.base_parser.exeptions import (
     XMLParseError,
     )
 from parsers.base_parser.parse_except import parse_expat_error
+from parsers.base_converter import BaseTypeConverter
+from parsers.type_converters import DefaultTypeConverter
 
 
 class BaseXMLParser(AbstractXMLParser):
@@ -24,7 +26,7 @@ class BaseXMLParser(AbstractXMLParser):
                  xml: str | TextIO,
                  target_items: str,
                  attrs: Sequence[str] | None = None,
-                 type_converter: None = None,
+                 type_converter: BaseTypeConverter | None = DefaultTypeConverter,
                  ) -> None:
         self.xml = xml
         self._check_xml_instance(xml=xml)
@@ -65,22 +67,26 @@ class BaseXMLParser(AbstractXMLParser):
                 )
 
     def _stuct_list_items(self,
-                          list_elements: Generator[NodeList[Element], None, None],
-                          ):
+                          list_elements: NodeList[Element],
+                          type_converter: BaseTypeConverter | None,
+                          ) -> Generator[dict[str, str], None, None]:
         """
         Вывод списка items
         """
-        list_parse_items = [{item.nodeName: item.firstChild.nodeValue
-                             for item
-                             in element.childNodes
-                             if item.firstChild}
-                            for element
-                            in list_elements]
-        return list_parse_items
+        for element in list_elements:
+            parsed_dict = dict()
+            for item in element.childNodes:
+                if item.firstChild:
+                    parsed_dict[item.nodeName] = item.firstChild.nodeValue
+            if type_converter:
+                yield type_converter(parsed_dict).convert()
+            else:
+                yield parsed_dict
 
     def _get_attrs(self,
                    document: Document,
                    attrs: Sequence[str],
+                   type_converter: DefaultTypeConverter | None,
                    ) -> None:
         result = defaultdict(str)
         for attr in attrs:
@@ -91,12 +97,15 @@ class BaseXMLParser(AbstractXMLParser):
                     if attr in node.attributes:
                         result.update({attr: node.attributes.get(attr).nodeValue})
                 curr_nodes = [node for node in curr_nodes[0].childNodes if node.firstChild]
-        self._attrs = result
+        if type_converter:
+            self._attrs = type_converter(result).convert()
+        else:
+            self._attrs = result
 
     def _get_items_target(self,
                           document: Document,
                           target_items: str,
-                          ) -> Generator[NodeList[Element], None, None]:
+                          ) -> NodeList[Element]:
         items = document.getElementsByTagName(target_items)
         return items
 
@@ -115,8 +124,8 @@ class BaseXMLParser(AbstractXMLParser):
                xml: str | TextIO,
                target_items: str,
                attrs: Sequence[str] | None,
-               type_converter: None,
-               ) -> list[dict[str, str]] | list[None]:
+               type_converter: BaseTypeConverter | None,
+               ) -> Generator[dict[str, str], None, None] | list[None]:
         """
         Метод парсинга данных из XML
         """
@@ -129,6 +138,7 @@ class BaseXMLParser(AbstractXMLParser):
             self._get_attrs(
                 document=document,
                 attrs=attrs,
+                type_converter=type_converter,
             )
         list_elements = self._get_items_target(
             document=document,
@@ -137,9 +147,8 @@ class BaseXMLParser(AbstractXMLParser):
         if list_elements:
             list_parse_items = self._stuct_list_items(
                 list_elements=list_elements,
+                type_converter=type_converter,
             )
-            if type_converter:
-                pass
             return list_parse_items
         return []
 
@@ -151,14 +160,11 @@ class BaseXMLParser(AbstractXMLParser):
         """
         Возвращает список после парсинга
         """
-        return self.items
+        return list(self.items)
 
     def get_generator(self) -> (Generator[dict[str, str],None, None] |
                                 list[None]):
         """
         Возвращает генератор после парсинга
         """
-        if self.items:
-            for item in self.items:
-                yield item
-        return []
+        return self.items

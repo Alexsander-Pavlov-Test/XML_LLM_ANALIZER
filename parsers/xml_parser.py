@@ -1,8 +1,8 @@
 import pathlib
 from typing import TextIO
-from parsers.base_parser import BaseXMLParser
 from xml.dom.minidom import parse, parseString
 
+from parsers.base_parser import BaseXMLParser
 from parsers.base_parser.exeptions import XMLParseError
 from api_v1.regex import check_xml_file
 
