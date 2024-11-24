@@ -1,5 +1,8 @@
+import os
+import reprlib
 import operator
-from typing import TextIO
+from copy import deepcopy
+from io import TextIOWrapper
 from collections.abc import Sequence, Generator, Callable
 from collections import defaultdict
 from xml.dom.minicompat import NodeList
@@ -23,7 +26,7 @@ class BaseXMLParser(AbstractXMLParser):
     PARSER = None
 
     def __init__(self,
-                 xml: str | TextIO,
+                 xml: str | TextIOWrapper,
                  target_items: str,
                  attrs: Sequence[str] | None = None,
                  type_converter: BaseTypeConverter | None = DefaultTypeConverter,
@@ -66,11 +69,17 @@ class BaseXMLParser(AbstractXMLParser):
     def __len__(self) -> int:
         return
 
-    def _check_xml_instance(self, xml: str | TextIO) -> None:
+    def _check_xml_instance(self, xml: str | TextIOWrapper) -> None:
         cls = type(self).__name__
         raise BaseModelNotProvideError(
                 f'Вы не можете использовать базовый класс {cls}',
                 )
+
+    def _chech_path_like(self, xml: str | TextIOWrapper | os.PathLike) -> bool:
+        return isinstance(xml, os.PathLike)
+
+    def _check_IO(self, xml: str | TextIOWrapper | os.PathLike) -> bool:
+        return isinstance(xml, TextIOWrapper)
 
     def _stuct_list_items(self,
                           list_elements: NodeList[Element],
@@ -128,8 +137,8 @@ class BaseXMLParser(AbstractXMLParser):
         return items
 
     def _get_document(self,
-                      xml: str | TextIO,
-                      parser: Callable[[str | TextIO], Document],
+                      xml: str | TextIOWrapper,
+                      parser: Callable[[str | TextIOWrapper], Document],
                       ) -> Document:
         try:
             document = parser(xml)
@@ -139,7 +148,7 @@ class BaseXMLParser(AbstractXMLParser):
         return document
 
     def _parse(self,
-               xml: str | TextIO,
+               xml: str | TextIOWrapper,
                target_items: str,
                attrs: Sequence[str] | None,
                type_converter: BaseTypeConverter | None,
@@ -148,6 +157,8 @@ class BaseXMLParser(AbstractXMLParser):
         Метод парсинга данных из XML
         """
         parser = self.get_parser()
+        if self._chech_path_like(xml):
+            xml = str(xml)
         document = self._get_document(
             xml=xml,
             parser=parser,
@@ -186,3 +197,26 @@ class BaseXMLParser(AbstractXMLParser):
         Возвращает генератор после парсинга
         """
         return self.items
+
+    def _custom_repr(self) -> reprlib.Repr:
+        CustomRepr = deepcopy(reprlib.aRepr)
+        CustomRepr.maxstring = 100
+        CustomRepr.maxlong = 110
+        CustomRepr.maxother = 110
+        CustomRepr.maxlevel = 30
+        return CustomRepr
+    
+    def __str__(self) -> str:
+        xml = self.xml
+        if self._chech_path_like(xml) or self._check_IO(xml):
+            xml = str(self.xml)
+        return xml
+
+    def __repr__(self) -> str:
+        xml = self.xml
+        if self._chech_path_like(xml) or self._check_IO(xml):
+            xml = str(self.xml)
+        cls_name = type(self).__name__
+        CustomRepr = self._custom_repr()
+        xml = CustomRepr.repr_str(self.xml, CustomRepr.maxlevel)
+        return f'{cls_name}({xml})'

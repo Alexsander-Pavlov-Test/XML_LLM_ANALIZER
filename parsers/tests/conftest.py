@@ -21,13 +21,13 @@ def xml_data():
 @pytest.fixture(scope='class')
 def load_xml(tmpdir_factory, xml_data):
     tmp_path = tmpdir_factory.mktemp('data').join('data_xml.xml')
-    with tmp_path.open(mode='w+') as file_:
+    with tmp_path.open(mode='w+', encoding='utf-8') as file_:
         file_.write(xml_data)
     return tmp_path
 
 
 @pytest.fixture(scope='class')
 def file_xml(load_xml):
-    with load_xml.open() as file_:
+    with load_xml.open(encoding='utf-8') as file_:
         xml = file_.read()
     return xml

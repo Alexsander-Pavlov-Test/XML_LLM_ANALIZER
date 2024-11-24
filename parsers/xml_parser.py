@@ -1,4 +1,5 @@
 import pathlib
+import os
 from typing import TextIO
 from xml.dom.minidom import parse, parseString
 
@@ -17,7 +18,8 @@ class StringXMLParser(BaseXMLParser):
         if not isinstance(xml, str):
             cls = type(self).__name__
             raise XMLParseError('Ошибка: Не возможно обработать '
-                                f'{xml} с помощью {cls}')
+                                f'{xml} с помощью {cls} '
+                                f'попробуйте {FileXMLParser.__name__}')
 
         if not xml.startswith('<?'):
             raise XMLParseError('Ошибка: XML файл должен иметь заголовок по '
@@ -35,20 +37,25 @@ class FileXMLParser(BaseXMLParser):
     PARSER = parse
 
     def _is_file(self, xml: str | TextIO) -> bool:
-        if isinstance(xml, str):
+        if isinstance(xml, os.PathLike | str):
+            self.xml = str(xml)
             path = pathlib.Path(xml)
             if path.is_file:
                 is_xml = check_xml_file(path.name)
                 if not is_xml:
-                    raise XMLParseError(f'Ошибка: Файл {path.name} не XML')
+                    raise XMLParseError(f'Ошибка: Файл {path.name} не XML '
+                                        f'попробуйте {StringXMLParser.__name__}')
                 if not path.exists():
-                    raise XMLParseError(f'Ошибка: Файл по пути {path.as_posix()} не найден')
+                    raise XMLParseError(
+                        f'Ошибка: Файл по пути {path.as_posix()} не найден',
+                        )
             else:
                 raise XMLParseError(f'Ошибка: {path.as_posix()} не файл')
         else:
-            is_xml = check_xml_file(xml.name)
+            xml_name = pathlib.Path(xml.name)
+            is_xml = check_xml_file(xml_name.name)
             if not is_xml:
-                raise XMLParseError(f'Ошибка: не верный формат файла')
+                raise XMLParseError(f'Ошибка: не верный формат файла {xml_name.name}')
             first_char = xml.read(1)
             if not first_char:
                 raise XMLParseError(f'Ошибка: файл пустой')
