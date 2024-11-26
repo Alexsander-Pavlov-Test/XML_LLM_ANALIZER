@@ -2,12 +2,14 @@ import asyncio
 import httpx
 import pytest_asyncio
 import pytest
+import random
 
 from typing import Any, AsyncGenerator
 from contextlib import asynccontextmanager
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from sqlalchemy.pool import NullPool
+from datetime import date
 
 from config import test_connection, settings, BaseModel
 from config import db_connection
@@ -71,3 +73,73 @@ async def client(app: FastAPI) -> AsyncGenerator[httpx.AsyncClient, Any]:
 async def get_async_session():
     async with db_setup.session() as session:
         yield session
+
+
+@pytest.fixture
+def get_list_items():
+    values = [
+        {'id': random.randint(1, 21000),
+         'name': 'Product A',
+         'quantity': 100,
+         'price': 1500.00,
+         'category': 'Builds',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product B',
+         'quantity': 44,
+         'price': 2344.00,
+         'category': 'Electronics',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product C',
+         'quantity': 133,
+         'price': 666.00,
+         'category': 'Machines',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product D',
+         'quantity': 1,
+         'price': 150000.00,
+         'category': 'Tools',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product E',
+         'quantity': 43,
+         'price': 33000.00,
+         'category': 'Electronics',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product G',
+         'quantity': 70,
+         'price': 5400.00,
+         'category': 'Electronics',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product N',
+         'quantity': 900,
+         'price': 90.00,
+         'category': 'Electronics',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product L',
+         'quantity': 55,
+         'price': 2300.00,
+         'category': 'Electronics',
+         'date': date(2024, 1, 1)
+         },
+        {'id': random.randint(1, 21000),
+         'name': 'Product M',
+         'quantity': 10,
+         'price': 15000.00,
+         'category': 'Electronics',
+         'date': date(2024, 1, 1)
+         },
+    ]
+    return values

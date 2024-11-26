@@ -75,10 +75,10 @@ class BaseXMLParser(AbstractXMLParser):
                 f'Вы не можете использовать базовый класс {cls}',
                 )
 
-    def _chech_path_like(self, xml: str | TextIOWrapper | os.PathLike) -> bool:
+    def _is_path_like(self, xml: str | TextIOWrapper | os.PathLike) -> bool:
         return isinstance(xml, os.PathLike)
 
-    def _check_IO(self, xml: str | TextIOWrapper | os.PathLike) -> bool:
+    def _is_IO(self, xml: str | TextIOWrapper | os.PathLike) -> bool:
         return isinstance(xml, TextIOWrapper)
 
     def _stuct_list_items(self,
@@ -157,7 +157,7 @@ class BaseXMLParser(AbstractXMLParser):
         Метод парсинга данных из XML
         """
         parser = self.get_parser()
-        if self._chech_path_like(xml):
+        if self._is_path_like(xml):
             xml = str(xml)
         document = self._get_document(
             xml=xml,
@@ -208,13 +208,13 @@ class BaseXMLParser(AbstractXMLParser):
     
     def __str__(self) -> str:
         xml = self.xml
-        if self._chech_path_like(xml) or self._check_IO(xml):
+        if self._is_path_like(xml) or self._is_IO(xml):
             xml = str(self.xml)
         return xml
 
     def __repr__(self) -> str:
         xml = self.xml
-        if self._chech_path_like(xml) or self._check_IO(xml):
+        if self._is_path_like(xml) or self._is_IO(xml):
             xml = str(self.xml)
         cls_name = type(self).__name__
         CustomRepr = self._custom_repr()

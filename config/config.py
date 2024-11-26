@@ -1,7 +1,8 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from starlette.config import Config
+from celery.schedules import crontab
 
 
 base_dir = Path(__file__).resolve().parent.parent
@@ -15,7 +16,32 @@ class Regex(BaseModel):
     """
     Регулярные выражения
     """
-    XML_REGEX: str = r'^\w+\.xml$' 
+    XML_REGEX: str = r'^\w+\.xml$'
+
+
+class AlembicSettings(BaseModel):
+    """
+    Настройки Alembic
+    """
+    CONFIG_PATH: Path = Path('alembic.ini')
+    MIGRATION_PATH: Path = Path('async_alembic/')
+
+
+class CelerySettings(BaseModel):
+    """
+    Настройки Celery
+    """
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+    TIMEZONE: str = 'Europe/Moscow'
+    TIMEDELTA_PER_DAY: crontab = crontab(minute=0,
+                                         hour=2,
+                                         day_of_week='*/1',
+                                         day_of_month='*/1',
+                                         month_of_year='*/1',
+                                         )
+    TEST_TIMEDELTA: crontab = crontab(minute='*/1')
 
 
 class TestDBSettings(BaseModel):
@@ -70,6 +96,8 @@ class Settings(BaseSettings):
     db: DBSettings = DBSettings()
     test_db: TestDBSettings = TestDBSettings()
     rabbit: RabbitSettings = RabbitSettings()
+    celery: CelerySettings = CelerySettings()
+    alembic: AlembicSettings = AlembicSettings()
     debug: bool = bool(int(config('DEBUG')))
     API_PREFIX: str = '/api/v1'
     BASE_DIR: Path = base_dir
@@ -77,8 +105,14 @@ class Settings(BaseSettings):
     CURRENT_ORIGIN: str = config('CURRENT_ORIGIN')
     regex: Regex = Regex()
     NAME_XML: str = 'items.xml'
+    TARGET_ITEMS_XML: str = 'product'
+    TARGET_ATTRS_XML: str = 'date'
     PATH_ITEMS_XML: Path = BASE_DIR.joinpath(NAME_XML)
     DATE_FORMAT: str = '%Y-%m-%d'
+    NAME_END_POINT_ANALIZE: str = '/products/get-list'
+    TASK_END_POINT_URL: str = (CURRENT_ORIGIN +
+                               API_PREFIX +
+                               NAME_END_POINT_ANALIZE)
 
 
 settings = Settings()
