@@ -12,3 +12,11 @@ class XMLParseError(Exception):
     """
 
     pass
+
+
+class NoDataParseError(Exception):
+    """
+    Исключение вызванное при пустом списке данных
+    """
+
+    pass

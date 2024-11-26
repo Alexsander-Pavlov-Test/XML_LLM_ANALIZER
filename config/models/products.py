@@ -8,7 +8,7 @@ class Product(Base):
     """
     Модель продукта
     """
-    sales_data: Mapped[date]
+    date: Mapped[date]
     name: Mapped[str]
     quantity: Mapped[int]
     price: Mapped[float]
