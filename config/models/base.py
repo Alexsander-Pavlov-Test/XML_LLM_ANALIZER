@@ -16,7 +16,7 @@ class Base(AsyncAttrs, DeclarativeBase):
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
 
-    id: Mapped[int] = mapped_column(Integer,
+    uid: Mapped[int] = mapped_column(Integer,
                                     primary_key=True,
                                     autoincrement=True,
                                     )

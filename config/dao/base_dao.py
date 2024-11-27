@@ -31,7 +31,6 @@ class BaseDAO:
         # Создание сущности
         item = ModelDAO.add(
             session,
-            return_instance=True,
             id=3,
             name='model',
             )
@@ -61,15 +60,15 @@ class BaseDAO:
 
         Returns:
             BaseModel: Сущность из выборки
-        """        
+        """
         stmt = struct_options_statment(
             model=cls.model,
             one_to_many=one_to_many,
             many_to_many=many_to_many,
-            kwargs=kwargs,
+            **kwargs,
         )
-        result = await session.execute(statement=stmt)
-        return result.one_or_none()
+        result = await session.scalar(statement=stmt)
+        return result
 
     @classmethod
     async def find_all_items_by_args(cls,
@@ -99,7 +98,7 @@ class BaseDAO:
             model=cls.model,
             one_to_many=one_to_many,
             many_to_many=many_to_many,
-            kwargs=kwargs,
+            **kwargs,
         )
         result = await session.scalars(statement=stmt)
         return list(result)

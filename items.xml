@@ -5,7 +5,7 @@
             <name>Product A</name>
             <quantity>100</quantity>
             <price>1500.00</price>
-            <category>Electronics</category>
+            <category>Builds</category>
         </product>
         <product>
             <id>2</id>
@@ -19,14 +19,14 @@
             <name>Product C</name>
             <quantity>133</quantity>
             <price>666.00</price>
-            <category>Electronics</category>
+            <category>Machines</category>
         </product>
         <product>
             <id>4</id>
             <name>Product D</name>
             <quantity>1</quantity>
             <price>150000.00</price>
-            <category>Electronics</category>
+            <category>Tools</category>
         </product>
         <product>
             <id>5</id>

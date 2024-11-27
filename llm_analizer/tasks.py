@@ -1,16 +1,15 @@
 import httpx
 
-from config import (
-    celery_app,
-    settings,
-    db_connection,
-    )
-import asyncio
 from api_v1.products.dao import ProductDAO
 from parsers import StringXMLParser
 from parsers.base_parser.exeptions import NoDataParseError
 from llm_analizer.utils import union_each_one_data
 from llm_analizer.utils import ProductPromptMaker
+from config import (
+    celery_app,
+    settings,
+    db_connection,
+    )
 
 
 @celery_app.task
@@ -22,8 +21,11 @@ async def get_analize_products_endpoint_task():
     парсятся в Dictiontary модель данных с конвертацие типов.
 
     Затем сущности сохраняются в базу данных.
+    
+    Отдельный класс генерирует промпр для LLM, исходя из указанной даты,
+    делает все необходимые аналитические выборки из базы данных.
 
-    После все действий данные отдаются LLM модели,
+    После всех действий данные отдаются LLM модели,
     которая в свою очередь анализирует данные по промпру
     и выводит результат.
 
