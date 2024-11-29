@@ -1,16 +1,51 @@
 services:
   fast_api:
+    container_name: fast_api
     restart: always
     build:
       context: .
-      dockerfile: ./docker/fastapi/Dockerfile
+      dockerfile: ./analizer/docker/fastapi/Dockerfile
     volumes:
-      - .:/app
+      - ./analizer:/app
     command: /start
     ports:
       - 8080:8000
     env_file:
-      - .env
+      - analizer/.env
+    depends_on:
+      - db
+      - rabbitmq
+
+  llm:
+    restart: always
+    container_name: llm
+    build:
+      context: .
+      dockerfile: ./llm/docker/llm/Dockerfile
+    volumes:
+      - ./llm:/app
+    command: /start
+    ports:
+      - 8081:8000
+    env_file:
+      - llm/.env
+    depends_on:
+      - db
+      - rabbitmq
+
+  xml:
+    restart: always
+    container_name: xml
+    build:
+      context: .
+      dockerfile: ./xml/docker/xml/Dockerfile
+    volumes:
+      - ./xml:/app
+    command: /start
+    ports:
+      - 8082:8000
+    env_file:
+      - xml/.env
     depends_on:
       - db
       - rabbitmq
@@ -19,7 +54,7 @@ services:
     hostname: rabbitmq
     image: rabbitmq:4.0.3-management
     env_file:
-      - .env
+      - analizer/.env
     ports:
       - 5672:5672
       - 15672:15672
@@ -31,12 +66,12 @@ services:
   celery_worker:
     build: 
       context: .
-      dockerfile: ./docker/fastapi/Dockerfile
+      dockerfile: ./analizer/docker/fastapi/Dockerfile
     command: /start-celeryworker
     volumes:
-      - .:/app
+      - ./analizer:/app
     env_file:
-      - .env
+      - analizer/.env
     depends_on:
       - rabbitmq
       - db
@@ -45,12 +80,12 @@ services:
   celery_beat:
     build: 
       context: .
-      dockerfile: ./docker/fastapi/Dockerfile
+      dockerfile: ./analizer/docker/fastapi/Dockerfile
     command: /start-celerybeat
     volumes:
-      - .:/app
+      - ./analizer/:/app
     env_file:
-      - .env
+      - analizer/.env
     depends_on:
       - rabbitmq
       - db
@@ -59,14 +94,14 @@ services:
   dashboard:
     build: 
       context: .
-      dockerfile: ./docker/fastapi/Dockerfile
+      dockerfile: ./analizer/docker/fastapi/Dockerfile
     command: /start-flower
     volumes:
-      - .:/app
+      - ./analizer:/app
     ports:
       - 5555:5555
     env_file:
-      - .env
+      - analizer/.env
     depends_on:
       - celery_worker
       - rabbitmq
