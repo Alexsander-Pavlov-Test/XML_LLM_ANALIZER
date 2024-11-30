@@ -37,9 +37,6 @@ class CelerySettings(BaseModel):
     TIMEZONE: str = 'Europe/Moscow'
     TIMEDELTA_PER_DAY: crontab = crontab(minute=0,
                                          hour=2,
-                                         day_of_week='*/1',
-                                         day_of_month='*/1',
-                                         month_of_year='*/1',
                                          )
     TEST_TIMEDELTA: crontab = crontab(minute='*/1')
 
