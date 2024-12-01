@@ -182,3 +182,7 @@ test.py
 
 # certs
 certs/
+
+# LLM
+llm/llm_analizer/qwen/*
+!llm/llm_analizer/qwen/README.md
