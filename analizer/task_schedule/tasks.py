@@ -1,5 +1,4 @@
 import httpx
-import json
 from httpx import ConnectError, Timeout
 from time import sleep
 from loguru import logger
@@ -50,9 +49,9 @@ async def get_analize_products_endpoint_task():
 
     body = response.content.decode(encoding='utf-8')
     parser = StringXMLParser(xml=body,
-                            target_items=settings.TARGET_ITEMS_XML,
-                            attrs=(settings.TARGET_ATTRS_XML,),
-                            )
+                             target_items=settings.TARGET_ITEMS_XML,
+                             attrs=(settings.TARGET_ATTRS_XML,),
+                             )
     parsed_items = parser.get_generator()
     attrs = parser.attrs
     date = attrs.get('date')
@@ -88,7 +87,11 @@ async def get_analize_products_endpoint_task():
             await client.aclose()
             sleep(30.0)
 
-    answer = llm_response.json()[0]
+    answer = llm_response.json()
+    if answer:
+        answer = answer[0]
+    else:
+        return
     async with db_connection.session() as session:
         await AnswerDAO.add(
             session=session,
