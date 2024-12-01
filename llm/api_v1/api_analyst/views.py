@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from loguru import logger
 
 from llm_analizer import Qwen
 from .schemas import GetDataAnalystSchema

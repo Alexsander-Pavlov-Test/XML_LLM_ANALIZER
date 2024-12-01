@@ -100,7 +100,7 @@ async def get_analize_products_endpoint_task():
 celery_app.conf.beat_schedule = {
     'task-every-day-analizer': {
         'task': 'task_schedule.tasks.get_analize_products_endpoint_task',
-        'schedule': settings.celery.TEST_TIMEDELTA,
+        'schedule': settings.celery.TIMEDELTA_PER_DAY,
         'args': ()
     },
 }
