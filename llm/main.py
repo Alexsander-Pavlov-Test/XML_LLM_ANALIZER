@@ -13,11 +13,11 @@ def start_app() -> FastAPI:
     """
     Создание приложения со всеми настройками
     """
+    Qwen.load_model()
     app = FastAPI(lifespan=lifespan)
     register_routers(app=app)
     register_errors(app=app)
     register_middlewares(app=app)
-    Qwen.load_pipline()
     return app
 
 

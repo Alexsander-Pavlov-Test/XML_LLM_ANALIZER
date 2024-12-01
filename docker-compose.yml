@@ -1,6 +1,5 @@
 services:
   fast_api:
-    container_name: fast_api
     restart: always
     build:
       context: .
@@ -9,33 +8,36 @@ services:
       - ./analizer:/app
     command: /start
     ports:
-      - 8080:8000
+      - 8080:8080
     env_file:
       - analizer/.env
+    networks:
+      - app-instanse
     depends_on:
       - db
       - rabbitmq
 
   llm:
     restart: always
-    container_name: llm
     build:
       context: .
       dockerfile: ./llm/docker/llm/Dockerfile
     volumes:
       - ./llm:/app
+    cpus: '4.0'
     command: /start
     ports:
-      - 8081:8000
+      - 8081:8081
     env_file:
       - llm/.env
+    networks:
+      - app-instanse
     depends_on:
       - db
       - rabbitmq
 
   xml:
     restart: always
-    container_name: xml
     build:
       context: .
       dockerfile: ./xml/docker/xml/Dockerfile
@@ -43,9 +45,11 @@ services:
       - ./xml:/app
     command: /start
     ports:
-      - 8082:8000
+      - 8082:8082
     env_file:
       - xml/.env
+    networks:
+      - app-instanse
     depends_on:
       - db
       - rabbitmq
@@ -60,6 +64,8 @@ services:
       - 15672:15672
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - app-instanse
     depends_on:
       - db
 
@@ -72,6 +78,8 @@ services:
       - ./analizer:/app
     env_file:
       - analizer/.env
+    networks:
+      - app-instanse
     depends_on:
       - rabbitmq
       - db
@@ -86,6 +94,8 @@ services:
       - ./analizer/:/app
     env_file:
       - analizer/.env
+    networks:
+      - app-instanse
     depends_on:
       - rabbitmq
       - db
@@ -102,6 +112,9 @@ services:
       - 5555:5555
     env_file:
       - analizer/.env
+    networks:
+      - app-instanse
+      - monitor-net
     depends_on:
       - celery_worker
       - rabbitmq
@@ -114,6 +127,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     hostname: db
+    networks:
+      - app-instanse
+      - monitor-net
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -124,6 +140,8 @@ services:
     volumes:
       - test_postgres_data:/var/lib/postgresql/data/
     hostname: test_db
+    networks:
+      - app-instanse
     expose:
       - 5431
     environment:
@@ -249,4 +267,6 @@ volumes:
 
 networks:
   monitor-net:
+    driver: bridge
+  app-instanse:
     driver: bridge

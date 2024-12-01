@@ -4,7 +4,6 @@ from sqlalchemy.orm import (DeclarativeBase,
                             declared_attr,
                             )
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy import Integer
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -16,7 +15,4 @@ class Base(AsyncAttrs, DeclarativeBase):
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
 
-    uid: Mapped[int] = mapped_column(Integer,
-                                    primary_key=True,
-                                    autoincrement=True,
-                                    )
+    uid: Mapped[int] = mapped_column(primary_key=True)

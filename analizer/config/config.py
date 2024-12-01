@@ -38,7 +38,7 @@ class CelerySettings(BaseModel):
     TIMEDELTA_PER_DAY: crontab = crontab(minute=0,
                                          hour=2,
                                          )
-    TEST_TIMEDELTA: crontab = crontab(minute='*/1')
+    TEST_TIMEDELTA: crontab = crontab(minute='*/2')
 
 
 class TestDBSettings(BaseModel):

@@ -20,6 +20,7 @@ pytest = "^8.3.3"
 prometheus-fastapi-instrumentator = "^7.0.0"
 lxml = "^5.3.0"
 celery = {extras = ["librabbitmq", "sqlalchemy"], version = "^5.4.0"}
+requests = "^2.32.3"
 
 
 [tool.poetry.group.dev.dependencies]

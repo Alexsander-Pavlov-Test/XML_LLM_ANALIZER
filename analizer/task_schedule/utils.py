@@ -96,7 +96,7 @@ class ProductPromptMaker:
         result = await session.scalars(statement=stmt)
         return list(result)
 
-    async def get_prompt(self) -> dict[str, str]:
+    async def get_prompt(self) -> list[dict[str, str]]:
         """
         Получение готового запроса для LLM
         со всеми готовыми данными

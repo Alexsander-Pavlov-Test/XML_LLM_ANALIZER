@@ -1,7 +1,8 @@
 from fastapi import APIRouter
+from loguru import logger
 
 from llm_analizer import Qwen
-from .schemas import ResponseAnalystSchema, GetDataAnalystSchema
+from .schemas import GetDataAnalystSchema
 
 
 router = APIRouter(prefix='/llm',
@@ -13,7 +14,7 @@ router = APIRouter(prefix='/llm',
             description='Send Prompt to Analyst',
             name='Request to Analyst',
             )
-async def request_analys(text: GetDataAnalystSchema) -> list[ResponseAnalystSchema]:
+async def request_analys(message: list[GetDataAnalystSchema]) -> list[str]:
     analyst = Qwen
-    response = analyst.make_question(text.text)
+    response = analyst.send_answer(message)
     return response

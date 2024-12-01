@@ -1,54 +1,106 @@
-import transformers
-from transformers import AutoTokenizer
-from transformers.tokenization_utils_base import PreTrainedTokenizerBase
-from transformers.pipelines import Pipeline
+from pathlib import Path
+from transformers import (
+    AutoTokenizer,
+    PreTrainedModel,
+    AutoModelForCausalLM,
+    PreTrainedTokenizer,
+    PreTrainedTokenizerFast,
+    )
 from typing import ClassVar
-import torch
-from torch import dtype
 
 from config import settings
 
 
-class LLMQwen:
-    """
-    Класс LLM модели Qwen
-    """
-    model: ClassVar[str] = settings.LLM.MODEL
-    t_dtype: ClassVar[dtype] = torch.bfloat16
-    tokenizer: ClassVar[PreTrainedTokenizerBase | None] = None
-    pipeline: ClassVar[Pipeline | None] = None
-
-    def _get_tokenizer(self,
-                       model: str,
-                       ) -> PreTrainedTokenizerBase:
-        return AutoTokenizer.from_pretrained(model)
+class Qwen2LLM:
+    model_name: ClassVar[str] = settings.LLM.QWEN2.NAME
+    cache_dir: ClassVar[Path] = settings.LLM.QWEN2.CACHE_DIR
+    model: ClassVar[PreTrainedModel | None] = None
+    torch_dtype: str = settings.LLM.TORCH_DTYPE
+    device_map: str = settings.LLM.DEVICE_MAP
+    revision: str = settings.LLM.REVISION
+    max_tokens: int = settings.LLM.QWEN2.MAX_TOKENS
 
     @classmethod
-    def load_pipline(cls) -> Pipeline:
-        cls.tokenizer = cls._get_tokenizer(cls, cls.model)
-        pipeline = transformers.pipeline(
-            'text-generation',
+    def load_model(cls):
+        cls.model = AutoModelForCausalLM.from_pretrained(
+            cls.model_name,
+            cache_dir=cls.cache_dir,
+            torch_dtype=cls.torch_dtype,
+            device_map=cls.device_map,
+            revision=cls.revision,
+        )
+
+    @classmethod
+    def _get_tokinazer(cls,
+                       model_name: str,
+                       ) -> PreTrainedTokenizer | PreTrainedTokenizerFast:
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_name,
+            cache_dir=cls.cache_dir,
+            use_fast=True,
+        )
+        return tokenizer
+
+    @classmethod
+    def _apply_chat_tokenizer(cls,
+                              tokenizer: (PreTrainedTokenizer |
+                                          PreTrainedTokenizerFast),
+                              message: list[dict[str, str]],
+                              ) -> list[int]:
+        return tokenizer.apply_chat_template(
+            message,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+
+    @classmethod
+    def _response(cls,
+                  tokenizer: (PreTrainedTokenizer |
+                              PreTrainedTokenizerFast),
+                  model: PreTrainedModel,
+                  chat: list[str],
+                  ) -> str:
+        model_inputs = tokenizer([chat], return_tensors="pt").to(model.device)
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=cls.max_tokens,
+            )
+        generated_ids = [output_ids[len(input_ids):] for
+                         input_ids, output_ids in
+                         zip(model_inputs.input_ids, generated_ids)]
+        return tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
+
+    @classmethod
+    def get_model_name_cache(cls) -> str:
+        return 'models--' + cls.model_name.replace('/', '--')
+
+    @classmethod
+    def get_locks_dir(cls) -> Path:
+        return cls.cache_dir.joinpath('.locks')
+
+    @classmethod
+    def get_cache_model_dir(cls) -> Path:
+        cache_name = cls.get_model_name_cache()
+        return cls.cache_dir.joinpath(cache_name)
+
+    @classmethod
+    def send_answer(cls, answer: list[dict[str, str]]) -> list[str]:
+        if (not cls.get_locks_dir().exists() or
+            not cls.get_cache_model_dir().exists() or
+            not cls.model
+        ):
+            cls.load_model()
+        tokenizer = cls._get_tokinazer(cls.model_name)
+        chat = cls._apply_chat_tokenizer(
+            tokenizer=tokenizer,
+            message=answer,
+        )
+        response = cls._response(
+            tokenizer=tokenizer,
             model=cls.model,
-            tokenizer=cls.tokenizer,
-            torch_dtype=cls.t_dtype,
-            trust_remote_code=True,
+            chat=chat
         )
-        cls.pipeline = pipeline
-        return pipeline
-
-    @classmethod
-    def make_question(cls, question: str) -> list[dict[str, str]]:
-        if not cls.pipeline:
-            cls.load_pipline()
-        sequences = cls.pipeline(
-            question,
-            max_length=512,
-            do_sample=True,
-            top_k=10,
-            num_return_sequences=1,
-            eos_token_id=cls.tokenizer.eos_token_id,
-        )
-        return sequences
+        return response
 
 
-Qwen = LLMQwen()
+Qwen = Qwen2LLM()

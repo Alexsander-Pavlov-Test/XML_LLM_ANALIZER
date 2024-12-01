@@ -6,6 +6,6 @@ class AnswerSchema(BaseModel):
     """
     Схема ответа от LLM модели
     """
-    id: int
+    uid: int
     date: date
     answer: str

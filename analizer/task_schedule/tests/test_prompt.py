@@ -18,14 +18,21 @@ def test_text_prompt():
         products=products,
         categories=categories,
     )
-    assert dict(
-    text="""You are the best data analyst. Analyze sales data for 2024-01-01:
+    assert [
+        dict(
+            role='system',
+            content='You are the best data analyst.',
+        ),
+        dict(
+            role='user',
+            content=f"""Analyze sales data for 2024-01-01:
 1. Total revenue: 10033.33 RUB.
 2. Top 3 products by sales: Iphone, MacBook. 
 3. Distribution by categories: Phones, Computers.
-
 Write a short analytical report with conclusions and recommendations.
-This is very important for my career""") == prompt
+This is very important for my career""",
+        )
+    ] == prompt
 
 
 @pytest.mark.asyncio

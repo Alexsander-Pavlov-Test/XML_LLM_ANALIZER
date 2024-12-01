@@ -3,7 +3,7 @@ def analysys_prompt(
     revenue: str,
     products: str,
     categories: str,
-    ) -> dict[str, str]:
+    ) -> list[dict[str, str]]:
     """
     Составление запроса для LLM
 
@@ -14,13 +14,21 @@ def analysys_prompt(
         category (str): Категории
 
     Returns:
-        dict[str, str]: Prompt
+        list[dict[str, str]]: Prompt
     """
-    analysys_prompt_test = dict(text=f"""You are the best data analyst. Analyze sales data for {date}:
+    prompt = [
+        dict(
+            role='system',
+            content='You are the best data analyst.',
+        ),
+        dict(
+            role='user',
+            content=f"""Analyze sales data for {date}:
 1. Total revenue: {revenue} RUB.
 2. Top 3 products by sales: {products}. 
 3. Distribution by categories: {categories}.
-
 Write a short analytical report with conclusions and recommendations.
-This is very important for my career""")
-    return analysys_prompt_test
+This is very important for my career""",
+        ),
+    ]
+    return prompt

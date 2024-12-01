@@ -1,4 +1,8 @@
 import httpx
+import json
+from httpx import ConnectError, Timeout
+from time import sleep
+from loguru import logger
 
 from config import (
     celery_app,
@@ -33,48 +37,70 @@ async def get_analize_products_endpoint_task():
     Результат сохраняется в отдельную таблицу в базе данных,
     и может помочь при дальнейшем анализе.
     """
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url=settings.XML_END_POINT_URL)
-        body = response.content.decode(encoding='utf-8')
-        parser = StringXMLParser(xml=body,
-                                target_items=settings.TARGET_ITEMS_XML,
-                                attrs=(settings.TARGET_ATTRS_XML,),
-                                )
-        parsed_items = parser.get_generator()
-        attrs = parser.attrs
-        date = attrs.get('date')
-        values_to_save = union_each_one_data(
-            data=attrs,
-            data_to_each=parsed_items,
-        )
+    while 1:
+        try:
+            async with httpx.AsyncClient(timeout=Timeout(None)) as client:
+                response = await client.get(url=settings.XML_END_POINT_URL)
+                await client.aclose()
+                break
+        except ConnectError:
+            logger.warning('Connection attempt failed, try 30 sec')
+            await client.aclose()
+            sleep(30.0)
 
-        if not parsed_items:
-            raise NoDataParseError('Нет данных для обработки')
-        async with db_connection.session() as session:
-            await ProductDAO.add_multiple(
-                session=session,
-                list_values=values_to_save,
-            )
-            prompt_maker = ProductPromptMaker(
-                session=session,
-                date=date
-            )
-            prompt = await prompt_maker.get_prompt()
-            llm_response = await client.put(
-                url=settings.LLM_END_POINT_URL,
-                json=prompt,
-            )
-            answer = llm_response.json()[0]['generated_text']
-            await AnswerDAO.add(
-                session=session,
-                date=date,
-                answer=answer,
+    body = response.content.decode(encoding='utf-8')
+    parser = StringXMLParser(xml=body,
+                            target_items=settings.TARGET_ITEMS_XML,
+                            attrs=(settings.TARGET_ATTRS_XML,),
+                            )
+    parsed_items = parser.get_generator()
+    attrs = parser.attrs
+    date = attrs.get('date')
+    values_to_save = union_each_one_data(
+        data=attrs,
+        data_to_each=parsed_items,
+    )
+
+    if not parsed_items:
+        raise NoDataParseError('Нет данных для обработки')
+    async with db_connection.session() as session:
+        await ProductDAO.add_multiple(
+            session=session,
+            list_values=values_to_save,
+        )
+        prompt_maker = ProductPromptMaker(
+            session=session,
+            date=date
+        )
+    prompt = await prompt_maker.get_prompt()
+
+    while 1:
+        try:
+            async with httpx.AsyncClient(timeout=Timeout(None)) as client:
+                llm_response = await client.put(
+                    url=settings.LLM_END_POINT_URL,
+                    json=prompt,
                 )
+                await client.aclose()
+                break
+        except ConnectError:
+            logger.warning('Connection attempt failed, try 30 sec')
+            await client.aclose()
+            sleep(30.0)
+
+    answer = llm_response.json()[0]
+    async with db_connection.session() as session:
+        await AnswerDAO.add(
+            session=session,
+            date=date,
+            answer=answer,
+            )
 
 
 celery_app.conf.beat_schedule = {
     'task-every-day-analizer': {
         'task': 'task_schedule.tasks.get_analize_products_endpoint_task',
-        'schedule': settings.celery.TIMEDELTA_PER_DAY,
+        'schedule': settings.celery.TEST_TIMEDELTA,
+        'args': ()
     },
 }
