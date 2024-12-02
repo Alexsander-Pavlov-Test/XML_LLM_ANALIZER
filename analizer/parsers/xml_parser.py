@@ -10,7 +10,22 @@ from api_v1.regex import check_xml_file
 
 class StringXMLParser(BaseXMLParser):
     """
-    XML парсер строчного типа
+    XML парсер строчного типа.
+
+    ## Пример:
+    ```python
+    from parsers import StringXMLParser
+
+
+    # Ответ от сервера с XML файлом
+    body = response.content.decode(encoding='utf-8')
+    parser = StringXMLParser(xml=body,
+                             target_items=settings.TARGET_ITEMS_XML,
+                             attrs=(settings.TARGET_ATTRS_XML,),
+                             )
+    parsed_items = parser.get_generator()
+    attrs = parser.attrs
+    ```
     """
     PARSER = parseString
 
@@ -33,6 +48,22 @@ class FileXMLParser(BaseXMLParser):
     (str): Путь к файлу
 
     (TextIO): Объект файла
+
+    ## Пример:
+    ```python
+    from pathlib import Path
+    from parsers import FileXMLParser
+
+
+    path = Path('some_xml.xml')
+    with path.open(mode='r', encoding='utf-8') as file_:
+        parser = FileXMLParser(xml=file_,
+                               target_items=settings.TARGET_ITEMS_XML,
+                               attrs=(settings.TARGET_ATTRS_XML,),
+                               )
+    parsed_items = parser.get_generator()
+    attrs = parser.attrs
+    ```
     """
     PARSER = parse
 

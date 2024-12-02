@@ -14,6 +14,15 @@ class BaseDAO:
     Универсальный класс для легкого опеределения
 
     CRUD модели
+    
+    ## Methods:
+        :class:`BaseDAO.find_item_by_args` - поиск одной сущности по
+        переданным аргументам.
+
+        :class:`BaseDAO.find_all_items_by_args` - множественный поиск
+        по переданным аргументам.
+
+        :class:`BaseDAO.add` - Создание сущности.
 
     Примеры::
 

@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from datetime import date
 from typing import Iterable, Generator
 
-from .task_types import TD
+from .task_types import TD, TemplateFunc
 from config.models import Product
 from .promts import analysys_prompt
 
@@ -32,7 +32,7 @@ def union_each_one_data(data: TD,
                 data=data,
                 data_to_each=data_to_each,
             )
-            # Вернет в виде генератора в которому будет:
+            # Вернет в виде генератора в котором будет:
             # [{'category': 'items', 'name': 'Name A'},
             # {'category': 'items', 'name': 'Name B'},]
 
@@ -46,16 +46,45 @@ def union_each_one_data(data: TD,
 
 class ProductPromptMaker:
     """
-    Класс генерации запроса для LLM
+    Класс генерации запроса для LLM.
+
+    Этот класс неоходим для корректного составления
+    запроса для LLM по опереденному шаблону.
+
+    ## Примеры:
+    ```python
+    from datetime import date
+    from task_schedule.promts import analysys_prompt
+    from task_schedule.utils import ProductPromptMaker
+    
+    session = AsyncSession
+    dete = date(2022, 11, 1)
+    prompt_maker = ProductPromptMaker(
+        session=session,
+        date=date,
+        template=analysys_prompt,
+    )
+    prompt = await prompt_maker.get_prompt()
+    ```
     """
+
     model = Product
 
     def __init__(self,
                  session: AsyncSession,
                  date: date,
+                 template: TemplateFunc = analysys_prompt,
                  ) -> None:
+        """
+        Args:
+            session (AsyncSession): Текущая сессия из Базы Данных
+            date (date): Дата для выборки из Базы Данных.
+            template (TemplateFunc, optional): Шаблон для составления запроса.\
+                По умолчанию - :function:`analysys_prompt`.
+        """        
         self._session = session
         self.date = date
+        self.template = template
 
     async def get_three_best_price(self,
                                    session: AsyncSession,
@@ -117,7 +146,7 @@ class ProductPromptMaker:
             date=self.date,
         )
         categories = ', '.join(categories)
-        prompt = analysys_prompt(
+        prompt = self.template(
             date=date,
             revenue=revenue,
             products=best_tree,

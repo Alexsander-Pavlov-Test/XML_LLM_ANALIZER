@@ -10,6 +10,22 @@ from api_v1.utils import correct_xml_path
 class FileXMLRender(Response):
     """
     Рендер XML ответа
+    
+    ## Example
+    ``` python
+    from fastapi import APIRouter
+    from api_v1.renders import FileXMLRender
+
+    router = APIRouter(prefix='/xml',
+                    tags=['XML'],
+                    )
+
+    @router.get(path='/get-list',
+                response_class=FileXMLRender,
+                )
+    async def get_products_xml():
+        return 'some/xml_file.xml'
+    ```
     """
     media_type = 'application/xml'
     charset = 'utf-8'

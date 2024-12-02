@@ -10,7 +10,16 @@ from parsers.base_converter.exeptions import BaseModelNotProvideError
 
 class BaseTypeConverter(AbctractTypeConverter):
     """
-    Базовый класс конвертера типов
+    Базовый класс конвертера типов.
+
+    Этот класс является Базовым и необоходим только для
+    переопеределения.
+
+    ### Для определения своего класса парсера нужно указать:
+
+    - Переопределить :class:`BaseTypeConverter.convert`
+
+    Для примера смотрите :class:`parsers.type_converters.DefaultTypeConverter`
     """
 
     def __init__(self,
@@ -19,6 +28,17 @@ class BaseTypeConverter(AbctractTypeConverter):
                  parse_float: bool = True,
                  parse_date: bool = True,
                  ) -> None:
+        """
+        Args:
+            target (MutableMapping): Объект в котором необходимо \
+                конвертировать типы данных. Объекта типа :class:`typing.MutableMapping`
+            parse_int (bool, optional): Конвертация числовых типов. \
+                По умолчания `True`.
+            parse_float (bool, optional): Конвертация чисел с плавайщей \
+                точкой. По умолчания `True`.
+            parse_date (bool, optional): Конвертация Времени типа `datetime.date`. \
+                По умолчания `True`.
+        """   
         self.contaiter = dict(target)
         self.parse_int = bool(parse_int)
         self.parse_float = bool(parse_float)
@@ -77,6 +97,9 @@ class BaseTypeConverter(AbctractTypeConverter):
             yield (key, item)
 
     def convert(self) -> MutableMapping:
+        """
+        Метод для переопеределения
+        """
         raise BaseModelNotProvideError(
             'Вы не можете использовать базовый класс',
         )

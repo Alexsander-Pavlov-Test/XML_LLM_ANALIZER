@@ -22,7 +22,19 @@ from parsers.type_converters import DefaultTypeConverter
 class BaseXMLParser(AbstractXMLParser):
     """
     Базовый XML парсер
+
+    Неоходим для наследования, определяет базовую логику
+    парсеров.
+
+    ### Для определения своего класса парсера нужно указать:
+
+    - Движок парсера :class:`BaseXMLParser.PARSER`
+    - Переопределить :class:`BaseXMLParser._check_xml_instance`
+
+    Для примера смотрите :class:`parsers.StringXMLParser` и
+    :class:`parsers.FileXMLParser`
     """
+
     PARSER = None
 
     def __init__(self,
@@ -34,6 +46,21 @@ class BaseXMLParser(AbstractXMLParser):
                  convert_float: bool = True,
                  convert_date: bool = True,
                  ) -> None:
+        """
+        Args:
+            xml (str | TextIOWrapper): XML сущность. Строка или файл.
+            target_items (str): Имя сущности в XML как целевой объект.
+            attrs (Sequence[str] | None, optional): Именованые атрибуты в \
+                XML, получить можно с помощью атрибута `attrs`.
+            type_converter (BaseTypeConverter | None, optional): Конвертер \
+                типов. По умолчанию :class:`parsers.type_converters.DefaultTypeConverter`.
+            convert_int (bool, optional): Конвертация числовых типов. \
+                По умолчания `True`.
+            convert_float (bool, optional): Конвертация чисел с плавайщей \
+                точкой. По умолчания `True`.
+            convert_date (bool, optional): Конвертация Времени типа `datetime.date`. \
+                По умолчания `True`.
+        """
         self.xml = xml
         self._check_xml_instance(xml=xml)
         self.target_items = target_items
@@ -70,6 +97,13 @@ class BaseXMLParser(AbstractXMLParser):
         return
 
     def _check_xml_instance(self, xml: str | TextIOWrapper) -> None:
+        """
+        Неоходимо переопределить при создании своего класса
+        парсера
+
+        Args:
+            xml (str | TextIOWrapper): XML сущность
+        """
         cls = type(self).__name__
         raise BaseModelNotProvideError(
                 f'Вы не можете использовать базовый класс {cls}',

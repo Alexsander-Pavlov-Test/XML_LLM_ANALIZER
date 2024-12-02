@@ -4,9 +4,33 @@ from datetime import date
 from parsers.base_converter import BaseTypeConverter
 from parsers.base_converter.exeptions import TypeConvertError
 
+
 class DefaultTypeConverter(BaseTypeConverter):
     """
-    Конвертер типов по умолчанию
+    Конвертер типов по умолчанию.
+
+    Неоходим для стандартного объема задач.
+
+    ## Пример:
+    ```python
+    dict_ = dict(
+        name='some_name',
+        date='2020-11-1'
+        price='3300.11,
+        quantity='4',
+    )
+    converter = DefaultTypeConverter(value=dict_)
+    converted_dict = converter.convert()
+    converted_dict
+    <<
+    {
+        name: 'some_name',
+        date=date(2020, 11, 1),
+        price=3300.11,
+        quantity=4,
+    }
+    >>
+    ```
     """
 
     def _convert_types(self,

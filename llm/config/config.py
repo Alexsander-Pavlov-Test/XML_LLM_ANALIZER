@@ -23,7 +23,7 @@ class QWEN2Settings(BaseModel):
 
 class LLMSettings(BaseModel):
     """
-    Настройки LLM модели
+    Настройки LLM моделей
     """
     QWEN2: QWEN2Settings = QWEN2Settings()
     MODEL: str = 'Qwen/Qwen2.5-1.5B-Instruct'

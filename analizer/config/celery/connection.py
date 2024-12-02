@@ -1,10 +1,9 @@
-from typing import Any, Awaitable, Callable
+import asyncio
 import celery
+from typing import Any, Awaitable, Callable
 from functools import wraps
 
 from config import settings
-
-import asyncio
 
 
 class Celery(celery.Celery):

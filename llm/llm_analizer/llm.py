@@ -12,6 +12,46 @@ from config import settings
 
 
 class Qwen2LLM:
+    """
+    Класс LLM модели Qwen2.
+    Данная модель предназначена для аналитики данных.
+
+    ## Предназначение:
+
+    Основное назначение этого класса это:
+    - Загрузка LLM модели локально.
+    - Настройка.
+    - Составление запроса.
+    - Обработка запроса LLM моделью.
+
+    ## Методы:
+    - :class:`Qwen2LLM.load_model()` - загрузка модели локально\
+        в кэш.
+    - :class:`Qwen2LLM.get_model_name_cache()` - вывод имени модели\
+        которое будет использоваться для загрузки.
+    - :class:`Qwen2LLM.get_locks_dir()` - вывод пути к папке модели\
+        которое будет использоваться для `.locks`.
+    - :class:`Qwen2LLM.get_cache_model_dir()` - вывод пути к папке\
+        которая будет использоваться для загрузки модели.
+    - :class:`Qwen2LLM.send_answer(answer)` - запрос к LLM модели\
+        для обрабоки данных.
+
+    ## Примеры:
+    ```python
+    question = [
+        {
+            'role': 'system',
+            'content': 'You are analyzer',
+        },
+        {
+            'role': 'user',
+            'content': 'Analyze this data, please.',
+        },
+    ]
+    # Отдать запрос LLM модели.
+    answer = Qwen2LLM.send_answer(question)
+    ```
+    """
     model_name: ClassVar[str] = settings.LLM.QWEN2.NAME
     cache_dir: ClassVar[Path] = settings.LLM.QWEN2.CACHE_DIR
     model: ClassVar[PreTrainedModel | None] = None
