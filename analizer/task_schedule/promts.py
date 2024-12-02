@@ -3,7 +3,7 @@ def analysys_prompt(
     revenue: str,
     products: str,
     categories: str,
-    ) -> list[dict[str, str]]:
+) -> list[dict[str, str]]:
     """
     Составление запроса для LLM
 
@@ -25,7 +25,7 @@ def analysys_prompt(
             role='user',
             content=f"""Analyze sales data for {date}:
 1. Total revenue: {revenue} RUB.
-2. Top 3 products by sales: {products}. 
+2. Top 3 products by sales: {products}.
 3. Distribution by categories: {categories}.
 Write a short analytical report with conclusions and recommendations.
 This is very important for my career""",

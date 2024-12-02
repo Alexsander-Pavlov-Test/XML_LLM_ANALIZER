@@ -88,7 +88,7 @@ def run_migrations_online() -> None:
                 poolclass=pool.NullPool,
                 future=True,
             )
-        ) 
+        )
     if isinstance(connectable, AsyncEngine):
         asyncio.run(run_async_migrations(connectable=connectable))
     else:

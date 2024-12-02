@@ -18,7 +18,8 @@ def union_each_one_data(data: TD,
     Args:
         data (TD): Сущность применяемая к основной структуре
 
-        data_to_each Iterable[TD]: Основная структрура с сущностями для объединения.
+        data_to_each Iterable[TD]: Основная структрура с
+        сущностями для объединения.
 
         Пример::
             # Cущность для добавления
@@ -56,7 +57,7 @@ class ProductPromptMaker:
     from datetime import date
     from task_schedule.promts import analysys_prompt
     from task_schedule.utils import ProductPromptMaker
-    
+
     session = AsyncSession
     dete = date(2022, 11, 1)
     prompt_maker = ProductPromptMaker(
@@ -81,7 +82,7 @@ class ProductPromptMaker:
             date (date): Дата для выборки из Базы Данных.
             template (TemplateFunc, optional): Шаблон для составления запроса.\
                 По умолчанию - :function:`analysys_prompt`.
-        """        
+        """
         self._session = session
         self.date = date
         self.template = template

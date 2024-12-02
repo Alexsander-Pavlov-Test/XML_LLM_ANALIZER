@@ -14,7 +14,7 @@ class BaseDAO:
     Универсальный класс для легкого опеределения
 
     CRUD модели
-    
+
     ## Methods:
         :class:`BaseDAO.find_item_by_args` - поиск одной сущности по
         переданным аргументам.
@@ -59,11 +59,11 @@ class BaseDAO:
         Args:
             session (AsyncSession): Текущая сессия
 
-            one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
+            one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля
                 для one_to_many
                 которые имеют отношение например: (Product.user)
 
-            many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
+            many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля
                 для many_to_many
                 которые имеют отношение например: (Product.categories)
 
@@ -92,11 +92,11 @@ class BaseDAO:
         Args:
             session (AsyncSession): Текущая сессия
 
-            one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
+            one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля
                 для one_to_many
                 которые имеют отношение например: (Product.user)
 
-            many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
+            many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля
                 для many_to_many
                 которые имеют отношение например: (Product.categories)
 
@@ -138,11 +138,11 @@ def struct_options_statment(model: BaseModel,
 
     Args:
         model (BaseModel): Модель таблицы для выборки
-        one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
+        one_to_many (Sequence[BaseModel] | None, optional): Выбранные поля
             для one_to_many
             которые имеют отношение например: (Product.user)
 
-        many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля 
+        many_to_many (Sequence[BaseModel] | None, optional): Выбранные поля
             для many_to_many
             которые имеют отношение например: (Product.categories)
 

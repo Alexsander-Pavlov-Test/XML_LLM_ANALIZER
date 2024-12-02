@@ -21,7 +21,7 @@ def correct_xml_path(path: str) -> pathlib.Path:
 
     ## Returns:
         pathlib.Path: Возвращает адресс в формате :class:`pathlib.Path`
-    
+
     ## Example
     ```python
     # Right
@@ -46,8 +46,8 @@ def correct_xml_path(path: str) -> pathlib.Path:
     ```
     """
     if not path:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail=dict(file='No data'))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=dict(file='No data'))
     path = pathlib.Path(str(path))
     if not path.exists():
         raise APIFileNotFoundError(

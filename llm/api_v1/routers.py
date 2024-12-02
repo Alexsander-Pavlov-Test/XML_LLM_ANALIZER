@@ -13,7 +13,7 @@ def register_routers(app: FastAPI) -> None:
 
     ## Returns:
         None
-    
+
     ## Example
     ```python
     from fastapi import FastAPI

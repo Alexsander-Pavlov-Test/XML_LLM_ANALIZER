@@ -1,7 +1,7 @@
 """add product
 
 Revision ID: 2ce5c84d86c4
-Revises: 
+Revises:
 Create Date: 2024-11-24 18:07:28.457358
 
 """

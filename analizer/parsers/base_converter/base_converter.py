@@ -38,7 +38,7 @@ class BaseTypeConverter(AbctractTypeConverter):
                 точкой. По умолчания `True`.
             parse_date (bool, optional): Конвертация Времени типа `datetime.date`. \
                 По умолчания `True`.
-        """   
+        """
         self.contaiter = dict(target)
         self.parse_int = bool(parse_int)
         self.parse_float = bool(parse_float)

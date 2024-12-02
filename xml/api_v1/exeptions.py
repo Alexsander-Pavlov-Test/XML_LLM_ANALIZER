@@ -12,6 +12,6 @@ class ValidationError(HTTPException):
 class APIFileNotFoundError(HTTPException):
     """
     Исключение вызванное не найденым файлом
-    """    
+    """
 
     pass

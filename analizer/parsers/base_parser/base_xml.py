@@ -151,7 +151,10 @@ class BaseXMLParser(AbstractXMLParser):
                 for node in curr_nodes:
                     if attr in node.attributes:
                         result.update({attr: node.attributes.get(attr).nodeValue})
-                curr_nodes = [node for node in curr_nodes[0].childNodes if node.firstChild]
+                curr_nodes = [node
+                              for node
+                              in curr_nodes[0].childNodes
+                              if node.firstChild]
         if type_converter:
             converter = type_converter(
                 result,
@@ -225,7 +228,7 @@ class BaseXMLParser(AbstractXMLParser):
         """
         return list(self.items)
 
-    def get_generator(self) -> (Generator[dict[str, str],None, None] |
+    def get_generator(self) -> (Generator[dict[str, str], None, None] |
                                 list[None]):
         """
         Возвращает генератор после парсинга
@@ -239,7 +242,7 @@ class BaseXMLParser(AbstractXMLParser):
         CustomRepr.maxother = 110
         CustomRepr.maxlevel = 30
         return CustomRepr
-    
+
     def __str__(self) -> str:
         xml = self.xml
         if self._is_path_like(xml) or self._is_IO(xml):

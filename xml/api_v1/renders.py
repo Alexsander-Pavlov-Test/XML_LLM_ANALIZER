@@ -10,7 +10,7 @@ from api_v1.utils import correct_xml_path
 class FileXMLRender(Response):
     """
     Рендер XML ответа
-    
+
     ## Example
     ``` python
     from fastapi import APIRouter

@@ -20,7 +20,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 
     - Для каждой таблицы создается автогенерируемое поле `id` или `uid`,
     которое автоинкремирует счетчик интидификатора сущностей.
-    
+
     ## Примеры:
     ```python
     from sqlalchemy.orm import Mapped, mapped_column
@@ -29,8 +29,8 @@ class Base(AsyncAttrs, DeclarativeBase):
     from datetime import date
 
     from config.models import Base
-    
-    
+
+
     class User(Base):
         name: Mapped[str] = mapped_column(String(length=100))
         surname: Mapped[str] = mapped_column(String(length=200))

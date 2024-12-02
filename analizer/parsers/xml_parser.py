@@ -89,7 +89,7 @@ class FileXMLParser(BaseXMLParser):
                 raise XMLParseError(f'Ошибка: не верный формат файла {xml_name.name}')
             first_char = xml.read(1)
             if not first_char:
-                raise XMLParseError(f'Ошибка: файл пустой')
+                raise XMLParseError('Ошибка: файл пустой')
             xml.seek(0)
 
     def _check_xml_instance(self, xml: str | TextIO) -> None:

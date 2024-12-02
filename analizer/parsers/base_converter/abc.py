@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from collections.abc import MutableMapping, MutableSequence
+from collections.abc import MutableMapping
 
 
 class AbctractTypeConverter(ABC, MutableMapping):
@@ -32,4 +32,3 @@ class AbctractTypeConverter(ABC, MutableMapping):
     @abstractmethod
     def convert(self) -> MutableMapping:
         pass
-        

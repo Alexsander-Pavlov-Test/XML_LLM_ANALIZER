@@ -25,9 +25,9 @@ def test_text_prompt():
         ),
         dict(
             role='user',
-            content=f"""Analyze sales data for 2024-01-01:
+            content="""Analyze sales data for 2024-01-01:
 1. Total revenue: 10033.33 RUB.
-2. Top 3 products by sales: Iphone, MacBook. 
+2. Top 3 products by sales: Iphone, MacBook.
 3. Distribution by categories: Phones, Computers.
 Write a short analytical report with conclusions and recommendations.
 This is very important for my career""",
@@ -64,7 +64,10 @@ async def test_prompt_maker_total(client, get_async_session, get_list_items):
 
 
 @pytest.mark.asyncio
-async def test_prompt_maker_categories(client, get_async_session, get_list_items):
+async def test_prompt_maker_categories(client,
+                                       get_async_session,
+                                       get_list_items,
+                                       ):
     date = datetime.date(2024, 1, 1)
     categories = await (ProductPromptMaker(
         session=get_async_session,
@@ -72,7 +75,11 @@ async def test_prompt_maker_categories(client, get_async_session, get_list_items
         ).get_categories(
             session=get_async_session,
             date=date))
-    assert categories == ['Builds', 'Category', 'Electronics', 'Machines', 'Tools']
+    assert categories == ['Builds',
+                          'Category',
+                          'Electronics',
+                          'Machines',
+                          'Tools']
 
 
 @pytest.mark.asyncio
@@ -83,12 +90,12 @@ async def test_prompt_maker(client, get_async_session, get_list_items):
         date=date,
         ).get_prompt())
     assert prompt == dict(
-    system='You are the best data analyst.',
-    user=f"""Analyze sales data for 2024-01-01:
+        system='You are the best data analyst.',
+        user="""Analyze sales data for 2024-01-01:
 1. Total revenue: 2651814.0.
-2. Top 3 products by sales: Product N, Product C, Product A. 
+2. Top 3 products by sales: Product N, Product C, Product A.
 3. Distribution by categories: Builds, Category, Electronics, Machines, Tools.
 
 Write a short analytical report with conclusions and recommendations.
 This is very important for my career""",
-)
+    )
